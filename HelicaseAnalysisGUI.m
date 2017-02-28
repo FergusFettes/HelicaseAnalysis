@@ -11,6 +11,7 @@ function HelicaseAnalysisGUI
 g.defPos=[2350          309         721         588];
 g.defPosGUI=[1950         450         350         500];
 g.defPosPAR=[2014         691         336         206];
+g.ttrcPos = g.defPos+[0 -220 100 360];
 
 % variables for minimized/maximized height
 pheightmin = 20; %titlewidth
@@ -535,7 +536,7 @@ function ttrc(~,~)
     end
 
     % create figure with enough subplots
-    g.FIGS.ttrc(figslong)=figure('Position',(g.defPos+figslong*[5 -5 0 0]+[0 -200 50 200]),'Name',figname{:},'NumberTitle','off', ...
+    g.FIGS.ttrc(figslong)=figure('Position',(g.ttrcPos),'Name',figname{:},'NumberTitle','off', ...
         'Toolbar','none','Menubar','none','Tag',tag{:});
 %         g.FIGS.ttrc(figslong)=figure('Position',(g.defPos+[0 -200 50 200]),'Name',figname{:},'NumberTitle','off', ...
 %         'Toolbar','none','Menubar','none','Tag',tag{:});
@@ -617,6 +618,9 @@ function ttrc(~,~)
                     g.FIGS.beadsPAN(beadSel(b)) = uix.Panel('Parent',beadsBOX);
                 %and controls
                 zoomBOX = uix.VBox('Parent',graphBOX);
+                    lineBOX= uix.HBox('Parent',zoomBOX);
+                        g.FIGS.traceview(figslong).norm(beadSel(b)) = uicontrol('Parent',uipanel('Parent',lineBOX,'Title','normal trace'), 'Style','Checkbox', 'Callback',{@tracetogglebutton,fid,figslong,beadSel(b),1}, 'Value',1);
+                        g.FIGS.traceview(figslong).smooth(beadSel(b)) = uicontrol('Parent',uipanel('Parent',lineBOX,'Title','smooth trace'), 'Style','Checkbox', 'Callback',{@tracetogglebutton,fid,figslong,beadSel(b),0}, 'Value',1);
                     hereBOX= uix.HBox('Parent',uipanel('Parent',zoomBOX,'Title','Settings Here'));
                         zoomGRID = uix.Grid('Parent',hereBOX);
                             xstrtPAN=uipanel('Parent',zoomGRID,'Title','x min');
@@ -652,7 +656,7 @@ function ttrc(~,~)
                                 g.FIGS.globlim(figslong).ymax(beadSel(b))=uicontrol('Parent',yfinPAN,'Style','edit','Callback',{@setlim},'Tag','glob ymax');
                         set(zoomGRID,'Heights',[-1 -1],'Widths',[-1 -1]);
                     uicontrol('Parent',zoomBOX,'String','Global Axes','Callback',{@changeplot});
-                set(zoomBOX,'Heights',[125 35 55 55 125 35]);
+                set(zoomBOX,'Heights',[55 125 35 55 55 125 35]);
             set(graphBOX,'Widths',[-1 180]);
         set(ubermainBOX,'Heights',[-1 -2]);
     end     
@@ -897,11 +901,13 @@ end % creates figure displaying fit parameters
 function plot_beads(~,~,fid,figslong,beadnum)
     %plot the beaddata in the right axes
 %   g.FIGS.plot(fid).bead(beadnum)=plot(axsBds(beadnum), d.tracedata(fid).t+globalT,d.tracedata(fid).Bead(beadnum).z,'b'); hold on;   % plot bdsZ removed globalT from the line below, see here for usage. dont know what it was for.
-    plot(g.FIGS.plot(fid).axes(beadnum),...
-        d.tracedata(fid).t,...
-      	 d.tracedata(fid).Bead(beadnum).zNORM,...
-       	  d.tracedata(fid).t,...
-      	   d.tracedata(fid).Bead(beadnum).z);    % plot bdsZ
+    g.FIGS.plot(fid).bead(beadnum).norm(figslong)=plot(g.FIGS.plot(fid).axes(beadnum),...
+                                         d.tracedata(fid).t,...
+                                          d.tracedata(fid).Bead(beadnum).zNORM, 'b');
+  	hold(g.FIGS.plot(fid).axes(beadnum),'on');
+    g.FIGS.plot(fid).bead(beadnum).smooth(figslong)=plot(g.FIGS.plot(fid).axes(beadnum),...
+                                                d.tracedata(fid).t,...
+                                                 d.tracedata(fid).Bead(beadnum).z, 'k');    % plot bdsZ
 
     %get the x-limits and export them to the axis-changers (local and global) and zoom controls
     xlimits=get(g.FIGS.plot(fid).axes(beadnum),'XLim');
@@ -2288,6 +2294,23 @@ function togglebutton(hObject,~,~)
             if isfield(g.BTNS.Params(index).ttrc(i),'Number')
                 set(g.BTNS.Params(index).ttrc(:),'Value',get(hObject,'Value'));
             end
+        end
+    end
+end %toggles visibility of paramters
+
+function tracetogglebutton(hObject,~,fid,index,beadnum,AssertNorm)
+   	% set the visibility of the window to the value of the togglebutton (ie on or off)
+    if AssertNorm
+        if get(hObject,'Value')
+            g.FIGS.plot(fid).bead(beadnum).norm(index).Visible = 'On';
+        else
+            g.FIGS.plot(fid).bead(beadnum).norm(index).Visible = 'Off';
+        end
+    else
+        if get(hObject,'Value')
+            g.FIGS.plot(fid).bead(beadnum).smooth(index).Visible = 'On';
+        else
+            g.FIGS.plot(fid).bead(beadnum).smooth(index).Visible = 'Off';
         end
     end
 end %toggles visibility of paramters
