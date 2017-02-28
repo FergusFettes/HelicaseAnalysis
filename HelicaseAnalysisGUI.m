@@ -1217,16 +1217,21 @@ function docalc (~,~)
     catch
     end
     
-    try    
+    try    %see if there is any data saved for this window/file
         for i=1:length(h.Params(fileID).fig(index).heights); if ~isempty(h.Params(fileID).fig(index).heights(i).part); beadNum(i)=i; end; end 
     catch
         errordlg('Have you selected any points?','Data not found.');
         return;
     end
     
-    beadNum=beadNum(beadNum~=0);
+%     beadNum=beadNum(beadNum~=0);
+
+  	beadnames=get(g.FIGS.pnlTAB(index),'TabTitles'); Bead=beadnames(get(g.FIGS.pnlTAB(index),'Selection'));
+    beadnum=regexp(Bead,'(\d+)(\w?)$','match'); beadNum=str2num(beadnum{:}{:});
     
-    for i=beadNum; partName(i)={g.FIGS.Params.heights(index).bead(i).RowName}; end %bead n<current has not been analysed in this case, that causes an error. cannot figure out the purpose of much of this though, its totally opaque. so i am going to leave it for now !!!
+%     for i=beadNum; 
+%         partName(i)={g.FIGS.Params.heights(index).bead(i).RowName};
+%     end %bead n<current has not been analysed in this case, that causes an error. cannot figure out the purpose of much of this though, its totally opaque. so i am going to leave it for now !!!
 
     filename=strcat('tmp_',fileNum{:},'.log');
     cFilename=fullfile(h.path,filename);
@@ -1290,9 +1295,9 @@ function docalc (~,~)
         
         h.Params(fileID).fig(index).results(j)=struct('force',bead(j).force,'height_bp',bead(j).highbp,'velocity_bp',bead(j).slopebp,'rate',bead(j).rate,'height',bead(j).delX,'time',bead(j).delT,'velocity',bead(j).slope,'conversion',bead(j).bpconvert);
 
-        RowNames=partName{j}(:)';
-        
-        g.FIGS.Params.heights(index).bead(j).RowName=RowNames(:)';
+%         RowNames=partName{j}(:)';
+%         
+%         g.FIGS.Params.heights(index).bead(j).RowName=RowNames(:)';
         g.FIGS.Params.heights(index).bead(j).Data=[bead(j).force;bead(j).highbp;bead(j).slopebp;bead(j).rate;bead(j).delX;bead(j).delT; ...
             bead(j).slope;h.Params(fileID).fig(index).heights(j).part.min;h.Params(fileID).fig(index).heights(j).part.max;h.Params(fileID).fig(index).heights(j).part.start; ...
                 h.Params(fileID).fig(index).heights(j).part.finish;]';
@@ -1439,7 +1444,11 @@ function SubmitEvents(hObject,~,~)
     cFilename=fullfile(h.path,filename);    
     time = getStrFromLog(cFilename,'time'); time = time(2:end-1);
     date = getStrFromLog(cFilename,'date'); date = date(2:end-1);
-    ActualTime = datetime([date ' ' time],'InputFormat', 'dd/MM/uuuu HH:mm:ss');
+    try
+        ActualTime = datetime([date ' ' time],'InputFormat', 'dd/MM/uuuu HH:mm:ss');
+    catch
+        ActualTime = datetime([date ' ' time],'InputFormat', 'dd.MM.uuuu HH:mm:ss');
+    end
     
     for i = 1: length(h.Params(fileID).fig(index).results(bead).force)
         times(i)= h.Params(fileID).fig(index).heights(bead).part(i).start;
@@ -2136,11 +2145,13 @@ function ClearData(~,~)
 end
 
 function getMother(~,~)
+    analysis.MainBeadList.Value=1;
     load('MotherFile.mat');
     DataHarvestUpdate;
 end
 
 function getBackup(~,~)
+    analysis.MainBeadList.Value=1;
     BackupName=inputdlg('Please enter the name of the file to retrieve', 'FILENAME.mat');
     if isempty(BackupName); return; end;
     load(BackupName{:});
