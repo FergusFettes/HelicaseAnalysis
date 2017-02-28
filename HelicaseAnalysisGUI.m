@@ -557,7 +557,7 @@ function ttrc(~,~)
         d.tracedata(fid).refZ=smooth(smoothdat,framerate./10);                    	 % assign refZ (smooth)
 
         for beadID=beadSel; 
-%             d.tracedata(fid).Bead(beadID).z=data{3*(beadID+1)};
+            d.tracedata(fid).Bead(beadID).zNORM=data{3*(beadID+1)};
         	smoothdat=data{3*(beadID+1)}; smoothdat(isnan(smoothdat))=0;         %NaNs kill smooth
             d.tracedata(fid).Bead(beadID).z=smooth(smoothdat,framerate./10);
         end;   % assign z all DNAbeads
@@ -897,8 +897,12 @@ end % creates figure displaying fit parameters
 function plot_beads(~,~,fid,figslong,beadnum)
     %plot the beaddata in the right axes
 %   g.FIGS.plot(fid).bead(beadnum)=plot(axsBds(beadnum), d.tracedata(fid).t+globalT,d.tracedata(fid).Bead(beadnum).z,'b'); hold on;   % plot bdsZ removed globalT from the line below, see here for usage. dont know what it was for.
-    g.FIGS.plot(fid).bead(beadnum)=plot(g.FIGS.plot(fid).axes(beadnum), d.tracedata(fid).t,d.tracedata(fid).Bead(beadnum).z,'k');    % plot bdsZ
-    
+    plot(g.FIGS.plot(fid).axes(beadnum),...
+        d.tracedata(fid).t,...
+      	 d.tracedata(fid).Bead(beadnum).zNORM,...
+       	  d.tracedata(fid).t,...
+      	   d.tracedata(fid).Bead(beadnum).z);    % plot bdsZ
+
     %get the x-limits and export them to the axis-changers (local and global) and zoom controls
     xlimits=get(g.FIGS.plot(fid).axes(beadnum),'XLim');
     g.FIGS.setlim(figslong).xmin(beadnum).String=xlimits(1); g.FIGS.setlim(figslong).xmax(beadnum).String=xlimits(2);
