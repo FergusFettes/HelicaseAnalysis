@@ -3,14 +3,16 @@ function HelicaseAnalysisGUI
 %% Variables and initial values %%
 % Positions for the popup windows
 % small screen settings
-% g.defPos=[850          309         721         588];
-% g.defPosGUI=[450         450         350         500];
-% g.defPosPAR=[514         691         336         206];
+%  g.defPos=[850          309         721         588];
+%  g.defPosGUI=[450         450         350         500];
+%  g.defPosPAR=[514         691         336         206];
+%  g.dataHarvestPosition=[2150         150         850         900];
 
 %big screen settings
 g.defPos=[2350          309         721         588];
 g.defPosGUI=[1950         450         350         500];
 g.defPosPAR=[2014         691         336         206];
+g.dataHarvestPosition=[2150         150         850         900];
 g.ttrcPos = g.defPos+[0 -220 100 360];
 
 % variables for minimized/maximized height
@@ -61,7 +63,7 @@ g.FIGS.main=figure('Name','parPlots GUI © DNAmotors','NumberTitle','off','Toolba
     g.FIGS.Params=[];
     
 h=guidata(g.FIGS.main);
-h.path='D:\data\Fergus\2017-02-07'; %!!! change back for finish NB tmp 036 has some good examples of data that could afford to be truncated. maybe use for learning to truncate
+h.path='D:\data\Fergus\2017-03-01'; %!!! change back for finish NB tmp 036 has some good examples of data that could afford to be truncated. maybe use for learning to truncate
 
 g.vbox1=uix.VBox('Parent',g.FIGS.main);
 % Path Selection %
@@ -903,11 +905,11 @@ function plot_beads(~,~,fid,figslong,beadnum)
 %   g.FIGS.plot(fid).bead(beadnum)=plot(axsBds(beadnum), d.tracedata(fid).t+globalT,d.tracedata(fid).Bead(beadnum).z,'b'); hold on;   % plot bdsZ removed globalT from the line below, see here for usage. dont know what it was for.
     g.FIGS.plot(fid).bead(beadnum).norm(figslong)=plot(g.FIGS.plot(fid).axes(beadnum),...
                                          d.tracedata(fid).t,...
-                                          d.tracedata(fid).Bead(beadnum).zNORM, 'b');
+                                          d.tracedata(fid).Bead(beadnum).zNORM, 'k');
   	hold(g.FIGS.plot(fid).axes(beadnum),'on');
     g.FIGS.plot(fid).bead(beadnum).smooth(figslong)=plot(g.FIGS.plot(fid).axes(beadnum),...
                                                 d.tracedata(fid).t,...
-                                                 d.tracedata(fid).Bead(beadnum).z, 'k');    % plot bdsZ
+                                                 d.tracedata(fid).Bead(beadnum).z, 'g');    % plot bdsZ
 
     %get the x-limits and export them to the axis-changers (local and global) and zoom controls
     xlimits=get(g.FIGS.plot(fid).axes(beadnum),'XLim');
