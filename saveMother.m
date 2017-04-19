@@ -1,5 +1,5 @@
 function saveMother(~,~)
-global analysis;
+global e;
 save('MotherFile.mat','e');
 end
 

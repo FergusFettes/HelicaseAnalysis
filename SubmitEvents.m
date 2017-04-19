@@ -1,5 +1,5 @@
 function SubmitEvents(hObject,~,~)
-global g; global h; global t;
+global g; global h; global t; global analysis;
 [index,fileID,fileNum]=GCF_Data;
     
     bead=str2double(get(hObject,'Tag'));

@@ -39,9 +39,9 @@ g.FitTypes.Cali1.bounds={   {'-10' '-10' '0'}, ...                           low
                             {'0' '0' '5'} };
 g.FitTypes.Cali1.data=[8, 2, 3];
 g.FitTypes.Worm.equation=  @(a,b,x) ((1.38e-23.*298)./(b.*1e-9)).* ... k_B T over persistance length (p in nanometers) a=L b=p
-                                ((4.*(1-(x./a)).^2).^(-1) - 4.^(-1) + ... first two bracketed compontents
+                                ((4.*(1-(x./a)).^2).^(-1) - 4.^(-1) + ... first two bracketed compontents NB x is in mu m
                                   (x./a) - 0.5164228.*(x./a).^2 - 2.737418.*(x./a).^3 + 16.07497.*(x./a).^4 - 38.87607.*(x./a).^5 + 39.49944.*(x./a).^6 - 14.17718.*(x./a).^7) ... sum with coefficients
-                                    .*1e12; %$$$
+                                    .*1e12; % so output is given in pico
 g.FitTypes.Worm.bounds={    {'max(xData)' '0' '[]'}, ...      lower bounds (must be three-component arrays) !!!ALL THIS EVAL STUFF CAN BE SORTED WITH OBJECT ORIENTED PROGRAMMING
                             {'1.1*max(xData)' '50' '[]'}, ... start point 
                             {'10' '100' '[]'} };            % upper bounds

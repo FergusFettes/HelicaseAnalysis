@@ -1,5 +1,5 @@
 function ttrc(~,~) 
-global g; global h;
+global g; global h; global d;
 beadstr=str2num(g.beadLST.String);
     beadSel=beadstr(g.beadLST.Value).'; % nbeadSel=length(beadSel);
     fileSel=sort(g.fileLST.String(g.fileLST.Value));

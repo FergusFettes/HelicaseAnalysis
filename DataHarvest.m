@@ -1,8 +1,8 @@
 function DataHarvest(~,~,~)
-global analysis; global e;
+global analysis; global e; global g;
     e=[];
     
-    dataHarvestPosition=[2150         150         850         900];
+    dataHarvestPosition=g.dataHarvestPosition;
 
     eventPropertiesStrings = {  'Force' 
                                 'Height(bp)' 

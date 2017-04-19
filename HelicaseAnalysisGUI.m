@@ -5,7 +5,7 @@ g.FIGS.main=figure('Name','parPlots GUI © DNAmotors','NumberTitle','off','Toolba
     
 global h;
 h=guidata(g.FIGS.main);
-h.path='Z:\GroupMembers\Fergus\MATLAB\parPlots\2016-02-17'; %!!! change back for finish NB tmp 036 has some good examples of data that could afford to be truncated. maybe use for learning to truncate
+h.path='D:\data\Fergus\2017-03-30'; %!!! change back for finish NB tmp 036 has some good examples of data that could afford to be truncated. maybe use for learning to truncate
 
 g.vbox1=uix.VBox('Parent',g.FIGS.main);
 % Path Selection %

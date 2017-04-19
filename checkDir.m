@@ -1,4 +1,4 @@
-function checkDir
+function checkDir(~,~)
     % set path to String in Text-Edit field
     global h; global g;
     h.path=g.pathEDT.String;

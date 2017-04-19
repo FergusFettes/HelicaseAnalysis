@@ -1,5 +1,5 @@
 function getBackup(~,~)
-global analysis;
+global analysis; global e;
 analysis.MainBeadList.Value=1;
     BackupName=inputdlg('Please enter the name of the file to retrieve', 'FILENAME.mat');
     if isempty(BackupName); return; end;
