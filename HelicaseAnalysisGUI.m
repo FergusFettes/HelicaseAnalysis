@@ -6,14 +6,15 @@ function HelicaseAnalysisGUI
 %  g.defPos=[850          309         721         588];
 %  g.defPosGUI=[450         450         350         500];
 %  g.defPosPAR=[514         691         336         206];
-%  g.dataHarvestPosition=[2150         150         850         900];
+%  g.dataHarvestPosition=[750         150         850         900];
+% g.ttrcPos = g.defPos + [-50 -200 100 200];
 
 %big screen settings
 g.defPos=[2350          309         721         588];
 g.defPosGUI=[1950         450         350         500];
 g.defPosPAR=[2014         691         336         206];
-g.dataHarvestPosition=[2150         150         850         900];
-g.ttrcPos = g.defPos+[0 -220 100 360];
+g.dataHarvestPosition=[750         150         850         900];
+g.ttrcPos = g.defPos + [-50 -200 100 200];
 
 % variables for minimized/maximized height
 pheightmin = 20; %titlewidth
@@ -63,7 +64,7 @@ g.FIGS.main=figure('Name','parPlots GUI © DNAmotors','NumberTitle','off','Toolba
     g.FIGS.Params=[];
     
 h=guidata(g.FIGS.main);
-h.path='D:\data\Fergus\2017-03-01'; %!!! change back for finish NB tmp 036 has some good examples of data that could afford to be truncated. maybe use for learning to truncate
+h.path='D:\data\Fergus\2017-03-28'; %!!! change back for finish NB tmp 036 has some good examples of data that could afford to be truncated. maybe use for learning to truncate
 
 g.vbox1=uix.VBox('Parent',g.FIGS.main);
 % Path Selection %
@@ -89,7 +90,7 @@ g.vbox1=uix.VBox('Parent',g.FIGS.main);
                         g.quickTTRCBTN=     uicontrol('Parent',g.quickCTRLGRD,'String','Time Trace',    'Callback',{@ttrc});
                         g.quickCLEANBTN=    uicontrol('Parent',g.quickCTRLGRD,'String','Collect Data',  'Callback',{@DataHarvest});
                         g.quickFRCBTN=      uicontrol('Parent',g.quickCTRLGRD,'String','Fast Force',    'Callback',{@force});
-                        g.quickEXPRTBTN=    uicontrol('Parent',g.quickCTRLGRD,'String','Data2MATLAB',   'Callback',{@exdat});
+                        g.quickEXPRTBTN=    uicontrol('Parent',g.quickCTRLGRD,'String','Projections',   'Callback',{@offset});
                     set(g.quickCTRLGRD, 'Heights', [-1 -1 -1], 'Widths', [-1 -1]);
                     
             %Panel containing options for force calibration
@@ -161,7 +162,9 @@ g.vbox1=uix.VBox('Parent',g.FIGS.main);
                 set(g.cleanBOX, 'Heights',[-1 25]);
                 
 %             g.svfsBTN=uicontrol('Parent',g.actnBOX,   'Style','push',     'String','Save Open Figures');
-            g.exfsBTN=uicontrol('Parent',g.actnBOX,   'Style','push',     'String','Export Figures','Callback',{@exfs});
+            g.asdBOX=uix.HBox('Parent',g.actnBOX);
+                g.exfsBTN=uicontrol('Parent',g.asdBOX,   'Style','push',     'String','Export Figures','Callback',{@exfs});
+                g.exdatBTN=uicontrol('Parent',g.asdBOX,   'Style','push',     'String','Export Data','Callback',{@exdat});
             
             %adds correctly numbered minimizefunction to panels
             %gets childs and assigns panels, can be done for any actionbox just by changing the line below. 
@@ -719,7 +722,7 @@ function ttrc(~,~)
     xlabel(axsRef,'Time (s)');
     ylabel(axsRef,'Height (mu m)');
     for i=1:length(beadSel)
-        if max(abs(d.tracedata(fid).Bead(beadSel(i)).z))>10
+        if min(d.tracedata(fid).Bead(beadSel(i)).z)<-2
             axis(axsBds(beadSel(i)),[0 max(d.tracedata(fid).t) 1 4]);
         else
             axis(axsBds(beadSel(i)),'tight');
@@ -897,6 +900,48 @@ function fitParamsFcal(tag,~)
     fitParamsTBL.RowName=beadsString(beadSel',:);
     fitParamsTBL.Data=[h.Params(fileID).fcal.a;h.Params(fileID).fcal.b;h.Params(fileID).fcal.c;h.Params(fileID).fcal.gdns]';
 end % creates figure displaying fit parameters
+
+function offset(~,~)
+% get bead and file selections
+    beadstr=str2num(g.beadLST.String);
+    beadSel=beadstr(g.beadLST.Value).'; nbeadSel=length(beadSel); 
+  	fileSel=g.fileLST.String(g.fileLST.Value); fileID=regexp(fileSel,'tmp_(\d\d\d)','tokens');
+
+
+    % prepare filename of selected file
+    if isfield(g.FIGS,'offs'); figslong=(1+length(g.FIGS.offs)); else figslong=1; end
+    
+    % create figure with enough subplots    
+   	g.FIGS.offs(figslong)=figure('Position',(g.defPos+figslong*[5 -5 0 0]),'Name','Offset 3D Plots','NumberTitle','off');
+
+    rows=round(nbeadSel^.5); cols=ceil(nbeadSel^.5); 
+    s = zeros(1,25); %preallocating
+    for i=1:(rows*cols); s(i)=subplot(rows,cols,i); end   
+    
+    cFile=fullfile(h.path,strcat(fileSel{:},'.dat'));
+    [DNAbeads]=getNumFromLog(strcat(cFile(1:end-4),'.log'),'#DNAbeads');   	 % get number of beads
+    data=getTweezerDataMB(cFile);                                          	 % load data ?? gettweezerdatamb$$$
+    t=data{1};                                                    % assign t
+    
+    for beadID=1:DNAbeads
+        Bead(beadID).z=data{3 * (beadID + 1)};
+        Bead(beadID).y=data{3 * (beadID + 1) - 1};
+        Bead(beadID).x=data{3 * (beadID + 1) - 2};
+    end;   % assign z all DNAbeads
+    
+    c = linspace(1,10,length(Bead(1).z));
+    
+    count=1;
+    for num=beadSel
+        scatter3(s(count),Bead(num).x,Bead(num).y,Bead(num).z,[],c);
+        view(s(count),[25 80]);
+        title(s(count),strcat('Bead',{' '},num2str(num)),'FontSize',8);
+        count=count+1;
+    end
+    
+    suplabel('Projections','t');
+
+end %fits beads to exp(ax^2+bx+c) and makes a parameters file
 
 %% Functionettes %%
 
@@ -1515,8 +1560,8 @@ end % orders and outputs the data in the t structure for DataTowneTM
 function DataHarvest(~,~,~)
     e=[];
     
-    dataHarvestPosition=[2150         150         850         900];
-
+    dataHarvestPosition=g.dataHarvestPosition;
+    
     eventPropertiesStrings = {  'Force' 
                                 'Height(bp)' 
                                	'Velocity(bp,Unwinding)' 
